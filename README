@@ -1,0 +1,12 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=4690
+
+This script lets you use tag-style lookups (i.e. C-] ) on Linux kernel oops
+stack traces.  For this to work, you need the following:
+1) The log file with the stack trace needs to be recognized as having
+   filetype=messages, which is hopefully the default.  If not, run 
+'set filetype=messages'.
+2) You need to have built your kernel with debug symbols
+   (CONFIG_DEBUG_INFO=y).
+3) Vim needs to have its PWD in your Linux build directory, or you need to
+   set up the g:oops_path global variable to your build directory.  i.e.:
+   let g:oops_path='/home/myuser/linux-kernel'
