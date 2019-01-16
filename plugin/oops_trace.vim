@@ -1,6 +1,6 @@
 " oops_trace.vim - Use tag-style lookups on Linux kernel oops backtraces.
 "
-" Maintainer:   Ross Zwisler <ross.zwislerNOSPAM@linux.intel.com>
+" Maintainer:   Ross Zwisler <zwislerNOSPAM@gmail.com>
 "
 " This script lets you use tag-style lookups (i.e. C-] ) on Linux kernel oops
 " stack traces.  For this to work, you need the following:
@@ -28,12 +28,14 @@ endfun
 
 function! s:GotoLine(file)
 	if (filereadable(a:file))
+            echo "file " . a:file . " not readable"
             return
 	endif
 
 	let names =  matchlist( a:file, '\([^:]\+\):\(\d\+\)')
 
 	if empty(names)
+            echo "no matching files"
             return
 	endif
 
@@ -43,6 +45,8 @@ function! s:GotoLine(file)
 	if filereadable(file_name)
             call s:FakeTagJump(file_name, line_num)
             exec "normal! zz"
+        else
+            echo "file " . file_name . " not readable"
 	endif
 endfunction
 
@@ -71,6 +75,7 @@ function! OopsTrace(line)
     if module == ''
         let module = oops_path . "/vmlinux"
     else
+        let module = substitute(module, "[-_]", "?", "g")
         let module = system("find " . oops_path . " -name " . module . ".ko")
         if module == ""
             echo "Kernel module not found"
@@ -93,7 +98,7 @@ function! OopsTrace(line)
         return
     endif
 
-    let abs_offset = system("printf 0x%x " . (func_offset + offset))
+    let abs_offset = system("printf 0x%x $((" . func_offset . "+" . offset . "))")
 
     let location = system('addr2line -e ' . module . ' ' . abs_offset)
     let location = substitute(location, '\n$', '', '')
